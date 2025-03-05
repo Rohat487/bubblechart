@@ -1,6 +1,6 @@
 //* ------------------------------------------------------------------
 //
-// WISSENSCHAFTSWOCHE A
+// WISSENSCHAFTSWOCHE A 
 //
 // Daten importieren
 //
@@ -124,7 +124,22 @@ var agecatCenters = { // Center locations of the bubbles.
     'Älter als 30 Jahre': 940
   };
     
+    // Fünfter Button: Zahlbarometer   
+ 
+var sorgenCenters = { // Center locations of the bubbles.
+    1: { x: 200, y: height / 2 },
+    2: { x: 400, y: height / 2 },
+    3: { x: 600, y: height / 2 },
+    4: { x: 800, y: height / 2 }
+  };
+
+  var sorgenTitleX = { // X locations of the year titles.
     
+    'Mache mir Sorgen um meine Daten': 200,
+    'Mache mir eher Sorgen': 400,
+    'Mache mir eher keine Sorgen': 600,
+    'Mache mir keine Sorgen um meine Daten': 800
+  };
 // Dritter Button: Geschlecht
     
   var sexCenters = { // Center locations of the bubbles. 
@@ -232,7 +247,7 @@ var agecatCenters = { // Center locations of the bubbles.
           
         sex: d.geschlecht,
           
-       
+       sorgen: d.sorgenbarometer,
         
         x: Math.random() * 900,
         y: Math.random() * 800
@@ -329,7 +344,7 @@ var agecatCenters = { // Center locations of the bubbles.
     hideAgecat();
     hideSex();
     hideScreentime();
-
+    hideSorgen();
     
     force.on('tick', function (e) {
       bubbles.each(moveToCenter(e.alpha))
@@ -371,6 +386,7 @@ Die Positionierung basiert auf dem alpha Parameter des force layouts und wird kl
     hideAgecat();
     hideSex();
     hideScreentime();
+    hideSorgen();
 
 
     force.on('tick', function (e) {
@@ -419,6 +435,7 @@ function moveToYear(alpha) {
     hideYear();
     hideSex();
     hideScreentime();
+    hideSorgen();
 
 
     force.on('tick', function (e) {
@@ -467,7 +484,7 @@ function moveToAgecat(alpha) {
     hideYear();
     hideAgecat();
     hideScreentime();
-
+    hideSorgen();
 
     force.on('tick', function (e) {
       bubbles.each(moveToSex(e.alpha))
@@ -510,11 +527,13 @@ function moveToAgecat(alpha) {
 //
 // -----------------------------------------------------------------*/
     
+  
   function splitBubblesintoScreentime() {
     showScreentime();
     hideYear();
     hideSex();
     hideAgecat();
+    hideSorgen();
 
 
     force.on('tick', function (e) {
@@ -552,6 +571,54 @@ function moveToAgecat(alpha) {
       .text(function (d) { return d; });
     }    
 
+  //* ------------------------------------------------------------------
+//
+// Sorgen
+//
+// -----------------------------------------------------------------*/
+    
+  function splitBubblesintoSorgen() {
+    showSorgen();
+    hideYear();
+    hideSex();
+    hideAgecat();
+    hideScreentime();
+
+    force.on('tick', function (e) {
+      bubbles.each(moveToSorgen(e.alpha))
+        .attr('cx', function (d) { return d.x; })
+        .attr('cy', function (d) { return d.y; });
+    });
+
+    force.start();
+  }
+
+  function moveToSorgen(alpha) {
+    return function (d) {
+      var target = sorgenCenters[d.sorgen];
+      d.x = d.x + (target.x - d.x) * damper * alpha * 1.1;
+      d.y = d.y + (target.y - d.y) * damper * alpha * 1.1;
+    };
+  }
+
+  function hideSorgen() {
+    svg.selectAll('.sorgen').remove();
+  }
+
+  function showSorgen() {
+
+    var sorgenData = d3.keys(sorgenTitleX);
+    var sorgen = svg.selectAll('.sorgen')
+      .data(sorgenData);
+
+    sorgen.enter().append('text')
+      .attr('class', 'sorgen')
+      .attr('x', function (d) { return sorgenTitleX[d]; })
+      .attr('y', 65)
+      .attr('text-anchor', 'middle')
+      .text(function (d) { return d; });
+    }    
+
   
     
     
@@ -580,6 +647,8 @@ function moveToAgecat(alpha) {
       splitBubblesintoSex();
     } else if (displayName === 'screentime') {
       splitBubblesintoScreentime();
+    } else if (displayName === 'sorgen') {
+      splitBubblesintoSorgen();
     } else {
       groupBubbles();
     }
@@ -626,9 +695,13 @@ function moveToAgecat(alpha) {
                   '<span class="name">Bildschirmzeit: </span><span class="value">' +
                   d.screentime +
                   '</span><br/>' +
+                  '<span class="name">Ich mache mir Sorgen um meine Daten: </span><span class="value">' +
+                  d.sorgen +
+                  '</span><br/>' +
                   '<span class="name">"Umfragejahr": </span><span class="value">' +
                   d.year +
                   '</span>';
+                  
     tooltip2.showtooltip2(content, d3.event);
   }
 
