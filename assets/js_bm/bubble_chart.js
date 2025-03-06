@@ -1,6 +1,6 @@
 //* ------------------------------------------------------------------
 //
-// WISSENSCHAFTSWOCHE A 
+// WISSENSCHAFTSWOCHE A
 //
 // Daten importieren
 //
@@ -123,23 +123,55 @@ var agecatCenters = { // Center locations of the bubbles.
     '20 - 29 Jahre': 800,
     'Älter als 30 Jahre': 940
   };
-    
-    // Fünfter Button: Zahlbarometer   
- 
-var sorgenCenters = { // Center locations of the bubbles.
-    1: { x: 200, y: height / 2 },
-    2: { x: 400, y: height / 2 },
-    3: { x: 600, y: height / 2 },
-    4: { x: 800, y: height / 2 }
+  
+  
+  
+  
+  
+  var sorgenCenters = { // Center locations of the bubbles.
+    1: { x: 300, y: height / 2 },
+    2: { x: 425, y: height / 2 },
+    3: { x: 550, y: height / 2 },
+    4: { x: 675, y: height / 2 }
   };
 
   var sorgenTitleX = { // X locations of the year titles.
     
-    'Mache mir Sorgen um meine Daten': 200,
-    'Mache mir eher Sorgen': 400,
-    'Mache mir eher keine Sorgen': 600,
-    'Mache mir keine Sorgen um meine Daten': 800
+    'Stimmt nicht': 130,
+    'Stimmt eher nicht': 350,
+    'Stimmt eher': 590,
+    'Stimmt': 850
   };
+  
+  
+  
+  
+  
+  var bezahlenCenters = { // Center locations of the bubbles.
+    0: { x: 290, y: height / 2 },
+    1: { x: 450, y: height / 2 },
+    2: { x: 550, y: height / 2 },
+    3: { x: 650, y: height / 1.9 },
+    4: { x: 750, y: height / 2 },
+    5: { x: 850, y: height / 2 }
+  };
+
+  var bezahlenTitleX = { // X locations of the year titles.
+    
+    'Ich wuerde auf die App verzichten': 200,
+    '1-2 CHF': 400,
+    '3-5 CHF': 575,
+    '6-10 CHF': 700,
+    '11-20 CHF': 825,
+    'Mehr als 20 CHF': 950
+  };
+  
+  
+  
+  
+  
+    
+    
 // Dritter Button: Geschlecht
     
   var sexCenters = { // Center locations of the bubbles. 
@@ -246,8 +278,11 @@ var sorgenCenters = { // Center locations of the bubbles.
         agecat: d.kategoriealter,
           
         sex: d.geschlecht,
-          
-       sorgen: d.sorgenbarometer,
+        
+        sorgen: d.sorgenbarometer,
+        
+        bezahlen: d.bezahlen,
+       
         
         x: Math.random() * 900,
         y: Math.random() * 800
@@ -345,6 +380,8 @@ var sorgenCenters = { // Center locations of the bubbles.
     hideSex();
     hideScreentime();
     hideSorgen();
+    hideBezahlen();
+
     
     force.on('tick', function (e) {
       bubbles.each(moveToCenter(e.alpha))
@@ -387,6 +424,7 @@ Die Positionierung basiert auf dem alpha Parameter des force layouts und wird kl
     hideSex();
     hideScreentime();
     hideSorgen();
+    hideBezahlen();
 
 
     force.on('tick', function (e) {
@@ -436,6 +474,7 @@ function moveToYear(alpha) {
     hideSex();
     hideScreentime();
     hideSorgen();
+    hideBezahlen();
 
 
     force.on('tick', function (e) {
@@ -485,6 +524,7 @@ function moveToAgecat(alpha) {
     hideAgecat();
     hideScreentime();
     hideSorgen();
+    hideBezahlen();
 
     force.on('tick', function (e) {
       bubbles.each(moveToSex(e.alpha))
@@ -527,13 +567,13 @@ function moveToAgecat(alpha) {
 //
 // -----------------------------------------------------------------*/
     
-  
   function splitBubblesintoScreentime() {
     showScreentime();
     hideYear();
     hideSex();
     hideAgecat();
     hideSorgen();
+    hideBezahlen();
 
 
     force.on('tick', function (e) {
@@ -571,11 +611,64 @@ function moveToAgecat(alpha) {
       .text(function (d) { return d; });
     }    
 
-  //* ------------------------------------------------------------------
-//
-// Sorgen
-//
-// -----------------------------------------------------------------*/
+  
+  
+  
+  function splitBubblesintoBezahlen() {
+    showBezahlen();
+    hideYear();
+    hideSex();
+    hideAgecat();
+    hideSorgen();
+    hideScreentime();
+
+
+    force.on('tick', function (e) {
+      bubbles.each(moveToBezahlen(e.alpha))
+        .attr('cx', function (d) { return d.x; })
+        .attr('cy', function (d) { return d.y; });
+    });
+
+    force.start();
+  }
+
+  function moveToBezahlen(alpha) {
+    return function (d) {
+      var target = bezahlenCenters[d.bezahlen];
+      d.x = d.x + (target.x - d.x) * damper * alpha * 1.1;
+      d.y = d.y + (target.y - d.y) * damper * alpha * 1.1;
+    };
+  }
+
+  function hideBezahlen() {
+    svg.selectAll('.bezahlen').remove();
+  }
+
+  function showBezahlen() {
+
+    var bezahlenData = d3.keys(bezahlenTitleX);
+    var bezahlen = svg.selectAll('.bezahlen')
+      .data(bezahlenData);
+
+    bezahlen.enter().append('text')
+      .attr('class', 'bezahlen')
+      .attr('x', function (d) { return bezahlenTitleX[d]; })
+      .attr('y', 65)
+      .attr('text-anchor', 'middle')
+      .text(function (d) { return d; });
+    }    
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
     
   function splitBubblesintoSorgen() {
     showSorgen();
@@ -583,6 +676,7 @@ function moveToAgecat(alpha) {
     hideSex();
     hideAgecat();
     hideScreentime();
+    hideBezahlen();
 
     force.on('tick', function (e) {
       bubbles.each(moveToSorgen(e.alpha))
@@ -619,7 +713,6 @@ function moveToAgecat(alpha) {
       .text(function (d) { return d; });
     }    
 
-  
     
     
 //* ------------------------------------------------------------------
@@ -647,6 +740,8 @@ function moveToAgecat(alpha) {
       splitBubblesintoSex();
     } else if (displayName === 'screentime') {
       splitBubblesintoScreentime();
+    } else if (displayName === 'bezahlen') {
+      splitBubblesintoBezahlen();
     } else if (displayName === 'sorgen') {
       splitBubblesintoSorgen();
     } else {
@@ -697,11 +792,12 @@ function moveToAgecat(alpha) {
                   '</span><br/>' +
                   '<span class="name">Ich mache mir Sorgen um meine Daten: </span><span class="value">' +
                   d.sorgen +
+                  '<span class="name">Wieviel wuerden Sie einmalig bezahlen um Ihre Lieblings Social Media Apps und Messenger noch nutzen zu koennen?: </span><span class="value">' +
+                  d.bezahlen +
                   '</span><br/>' +
                   '<span class="name">"Umfragejahr": </span><span class="value">' +
                   d.year +
                   '</span>';
-                  
     tooltip2.showtooltip2(content, d3.event);
   }
 
